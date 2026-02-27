@@ -839,13 +839,7 @@
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="sidebar-header">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <h1 id="home-btn" style="cursor:pointer;" title="Home">Claude Code Local</h1>
-      <div style="display:flex;gap:2px;">
-        <button class="btn lang-btn" id="btn-lang-en" style="font-size:10px;padding:3px 7px;min-width:0;">EN</button>
-        <button class="btn lang-btn" id="btn-lang-ko" style="font-size:10px;padding:3px 7px;min-width:0;">KO</button>
-      </div>
-    </div>
+    <h1 id="home-btn" style="cursor:pointer;" title="Home">Claude Code Local</h1>
     <div class="sub" id="sidebar-count">Loading...</div>
   </div>
   <div id="sidebar-list"></div>
@@ -855,7 +849,13 @@
 <div id="main">
   <div id="topbar">
     <h2 id="topbar-filename">Select a dump file to inspect</h2>
-    <button class="btn" id="btn-compare">Compare</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+      <div style="display:flex;gap:2px;">
+        <button class="btn lang-btn" id="btn-lang-en" style="font-size:10px;padding:3px 7px;min-width:0;">EN</button>
+        <button class="btn lang-btn" id="btn-lang-ko" style="font-size:10px;padding:3px 7px;min-width:0;">KO</button>
+      </div>
+      <button class="btn" id="btn-compare">Compare</button>
+    </div>
   </div>
 
   <div id="content">
