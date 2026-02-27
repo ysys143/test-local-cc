@@ -1258,25 +1258,21 @@ function renderSessionSummary(sess, sessionIndex) {
   const totalSize = sess.files.reduce((s,f) => s + DUMPS[f].size, 0);
   const maxFileSize = Math.max(...sess.files.map(f => DUMPS[f].size));
 
-  // Calculate cumulative sizes
   const firstEntry = DUMPS[sess.files[0]];
   const firstSz = calcSizes(firstEntry.data);
   const lastMainFile = mainFiles[mainFiles.length - 1];
   const lastEntry = DUMPS[lastMainFile];
   const lastSz = calcSizes(lastEntry.data);
 
-  // Size growth: system+tools are constant, messages grow
   const sysToolsSize = firstSz.sysSize + firstSz.toolSize;
   const firstMsgSize = firstSz.msgSize;
   const lastMsgSize = lastSz.msgSize;
-
   const firstSize = firstEntry.size;
   const sessTag = sizeTag(firstSize, firstEntry.data.model);
-
   const promptShort = sess.prompt.length > 120 ? sess.prompt.slice(0, 120) + '...' : sess.prompt;
 
   // Timeline items
-  const timelineHtml = sess.files.map((fname, fi) => {
+  const timelineItems = sess.files.map(function(fname) {
     const entry = DUMPS[fname];
     const d = entry.data;
     const model = d.model || '?';
@@ -1285,100 +1281,67 @@ function renderSessionSummary(sess, sessionIndex) {
     const sz = calcSizes(d);
     const turnLabel = isHaiku ? 'INTERNAL' : 'Turn ' + Math.ceil(msgCount/2);
     const pct = Math.round(entry.size / maxFileSize * 100);
-
-    const sysColor = '#4a9eff';
-    const toolColor = '#ffd166';
-    const msgColor = '#4aff9e';
     const sysPct = Math.round(sz.sysSize / (sz.total||1) * 100);
     const toolPct = Math.round(sz.toolSize / (sz.total||1) * 100);
-
     const ts = fname.match(/T(\d{2})(\d{2})(\d{2})/);
     const timeStr = ts ? ts[1]+':'+ts[2]+':'+ts[3] : '';
 
-    return \`
-      <div class="sess-tl-item" data-file="\${fname}" title="Click to view details">
-        <div class="sess-tl-dot \${isHaiku ? 'internal' : ''}"></div>
-        <div class="sess-tl-info">
-          <div class="tl-label">
-            \${turnLabel}
-            <span style="font-weight:400;color:var(--text-muted);margin-left:6px;">\${timeStr}</span>
-            \${isHaiku ? '<span class="tag tag-internal" style="margin-left:4px;">haiku</span>' : ''}
-          </div>
-          <div class="tl-detail">
-            \${fmtBytes(entry.size)} &bull; \${msgCount} msgs
-            \${!isHaiku ? '&bull; sys:'+fmtBytes(sz.sysSize)+' tools:'+fmtBytes(sz.toolSize)+' msgs:'+fmtBytes(sz.msgSize) : '&bull; no tools'}
-          </div>
-          <div class="sess-tl-bar">
-            <div class="sess-tl-bar-inner" style="width:\${pct}%;background:linear-gradient(90deg, \${sysColor} 0%, \${sysColor} \${sysPct}%, \${toolColor} \${sysPct}%, \${toolColor} \${sysPct+toolPct}%, \${msgColor} \${sysPct+toolPct}%, \${msgColor} 100%);"></div>
-          </div>
-        </div>
-      </div>
-    \`;
+    const haikuTag = isHaiku ? '<span class="tag tag-internal" style="margin-left:4px;">haiku</span>' : '';
+    const detailStr = !isHaiku
+      ? fmtBytes(entry.size)+' \u2022 '+msgCount+' msgs \u2022 sys:'+fmtBytes(sz.sysSize)+' tools:'+fmtBytes(sz.toolSize)+' msgs:'+fmtBytes(sz.msgSize)
+      : fmtBytes(entry.size)+' \u2022 '+msgCount+' msgs \u2022 no tools';
+    const barBg = 'linear-gradient(90deg, #4a9eff 0%, #4a9eff '+sysPct+'%, #ffd166 '+sysPct+'%, #ffd166 '+(sysPct+toolPct)+'%, #4aff9e '+(sysPct+toolPct)+'%, #4aff9e 100%)';
+
+    return '<div class="sess-tl-item" data-file="'+fname+'" title="Click to view details">'
+      + '<div class="sess-tl-dot '+(isHaiku?'internal':'')+'"></div>'
+      + '<div class="sess-tl-info">'
+      + '<div class="tl-label">'+turnLabel+'<span style="font-weight:400;color:var(--text-muted);margin-left:6px;">'+timeStr+'</span>'+haikuTag+'</div>'
+      + '<div class="tl-detail">'+detailStr+'</div>'
+      + '<div class="sess-tl-bar"><div class="sess-tl-bar-inner" style="width:'+pct+'%;background:'+barBg+';"></div></div>'
+      + '</div></div>';
   }).join('');
 
-  // Repeated data calc
-  const repeatedSysTools = sysToolsSize * (mainFiles.length - 1);
+  const repeatedHtml = mainFiles.length > 1
+    ? '<div class="finding" style="margin-top:12px;"><b>Repeated overhead:</b> System + Tools ('+fmtBytes(sysToolsSize)+') sent '+mainFiles.length+' times = <b>'+fmtBytes(sysToolsSize*mainFiles.length)+'</b> total. Only messages grow between turns.</div>'
+    : '';
 
-  view.innerHTML = \`
-    <div class="card">
-      <div class="card-title">Session \${sessionIndex + 1} \${sessTag}</div>
-      <div style="margin-top:8px;font-size:13px;color:var(--text);line-height:1.5;">\${escHtml(promptShort)}</div>
-      <div class="sess-size-breakdown" style="margin-top:16px;">
-        <div class="sess-size-cell">
-          <div class="val blue">\${sess.files.length}</div>
-          <div class="lbl">Requests (\${mainFiles.length} main + \${intFiles.length} internal)</div>
-        </div>
-        <div class="sess-size-cell">
-          <div class="val green">\${turns}</div>
-          <div class="lbl">Turns</div>
-        </div>
-        <div class="sess-size-cell">
-          <div class="val" style="color:var(--purple);">\${fmtBytes(totalSize)}</div>
-          <div class="lbl">Total Data Sent</div>
-        </div>
-      </div>
-    </div>
+  view.innerHTML = ''
+    + '<div class="card">'
+    + '<div class="card-title">Session '+(sessionIndex+1)+' '+sessTag+'</div>'
+    + '<div style="margin-top:8px;font-size:13px;color:var(--text);line-height:1.5;">'+escHtml(promptShort)+'</div>'
+    + '<div class="sess-size-breakdown" style="margin-top:16px;">'
+    + '<div class="sess-size-cell"><div class="val blue">'+sess.files.length+'</div><div class="lbl">Requests ('+mainFiles.length+' main + '+intFiles.length+' internal)</div></div>'
+    + '<div class="sess-size-cell"><div class="val green">'+turns+'</div><div class="lbl">Turns</div></div>'
+    + '<div class="sess-size-cell"><div class="val" style="color:var(--purple);">'+fmtBytes(totalSize)+'</div><div class="lbl">Total Data Sent</div></div>'
+    + '</div></div>'
 
-    <div class="card">
-      <div class="card-title">Size Breakdown</div>
-      <div class="sess-size-breakdown">
-        <div class="sess-size-cell">
-          <div class="val" style="color:#4a9eff;">\${fmtBytes(firstSz.sysSize)}</div>
-          <div class="lbl">System (per request)</div>
-        </div>
-        <div class="sess-size-cell">
-          <div class="val" style="color:#ffd166;">\${fmtBytes(firstSz.toolSize)}</div>
-          <div class="lbl">Tools (per request)</div>
-        </div>
-        <div class="sess-size-cell">
-          <div class="val" style="color:#4aff9e;">\${fmtBytes(firstMsgSize)} &rarr; \${fmtBytes(lastMsgSize)}</div>
-          <div class="lbl">Messages (first &rarr; last)</div>
-        </div>
-      </div>
-      \${mainFiles.length > 1 ? \`
-      <div class="finding" style="margin-top:12px;">
-        <b>Repeated overhead:</b> System + Tools (\${fmtBytes(sysToolsSize)}) sent \${mainFiles.length} times = <b>\${fmtBytes(sysToolsSize * mainFiles.length)}</b> total.
-        Only messages grow between turns.
-      </div>\` : ''}
-    </div>
+    + '<div class="card">'
+    + '<div class="card-title">Size Breakdown</div>'
+    + '<div class="sess-size-breakdown">'
+    + '<div class="sess-size-cell"><div class="val" style="color:#4a9eff;">'+fmtBytes(firstSz.sysSize)+'</div><div class="lbl">System (per request)</div></div>'
+    + '<div class="sess-size-cell"><div class="val" style="color:#ffd166;">'+fmtBytes(firstSz.toolSize)+'</div><div class="lbl">Tools (per request)</div></div>'
+    + '<div class="sess-size-cell"><div class="val" style="color:#4aff9e;">'+fmtBytes(firstMsgSize)+' &rarr; '+fmtBytes(lastMsgSize)+'</div><div class="lbl">Messages (first &rarr; last)</div></div>'
+    + '</div>'
+    + repeatedHtml
+    + '</div>'
 
-    <div class="card">
-      <div class="card-title">Request Timeline</div>
-      <div class="sess-timeline">\${timelineHtml}</div>
-    </div>
-  \`;
+    + '<div class="card">'
+    + '<div class="card-title">Request Timeline</div>'
+    + '<div class="sess-timeline">'+timelineItems+'</div>'
+    + '</div>';
 
   // Wire timeline item clicks
-  view.querySelectorAll('.sess-tl-item[data-file]').forEach(item => {
-    item.addEventListener('click', () => {
-      const fname = item.dataset.file;
-      document.querySelectorAll('.file-item').forEach(x => x.classList.remove('active'));
-      const fileEl = sidebarList.querySelector(\`.file-item[data-file="\${fname}"]\`);
+  view.querySelectorAll('.sess-tl-item[data-file]').forEach(function(item) {
+    item.addEventListener('click', function() {
+      var fname = item.dataset.file;
+      document.querySelectorAll('.file-item').forEach(function(x) { x.classList.remove('active'); });
+      var fileEl = sidebarList.querySelector('.file-item[data-file="'+fname+'"]');
       if (fileEl) fileEl.classList.add('active');
       loadFile(fname);
     });
   });
 }
+
 
 // ── LOAD FILE ──
 function loadFile(fname) {
