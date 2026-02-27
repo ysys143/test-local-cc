@@ -1,0 +1,60 @@
+
+╭─── Claude Code v2.1.56 ──────────────────────────────────────────────────────╮
+│                                      │ Tips for getting started              │
+│           Welcome back js!           │ Run /init to create a CLAUDE.md file… │
+│                                      │ ───────────────────────────────────── │
+│               ▗ ▗   ▖ ▖              │ Recent activity                       │
+│                                      │ No recent activity                    │
+│                 ▘▘ ▝▝                │                                       │
+│                                      │                                       │
+│        Opus 4.6 · Claude Max         │                                       │
+│   ~/Documents/GitHub/test_local_cc   │                                       │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❯ 파이썬으로 간단한 hello world 출력하는 스크립트 파일 작성해줘. 
+
+⏺ Write(hello_world.py)
+  ⎿  Wrote 1 lines to hello_world.py
+     print("Hello, World!")
+
+⏺ Hello World 스크립트를 만들었습니다. 실행해 볼까요?
+
+  python hello_world.py
+
+⏺ Ran 2 stop hooks (ctrl+o to expand)
+  ⎿  Stop hook prevented continuation
+
+✻ Baked for 1m 37s
+
+❯ 실행해봐 
+
+⏺ Bash(python hello_world.py)
+  ⎿  Hello, World!
+
+⏺ 실행되었습니다! "Hello, World!" 가 출력됩니다.
+
+⏺ Ran 2 stop hooks (ctrl+o to expand)
+  ⎿  Stop hook prevented continuation
+
+✻ Cooked for 1m 44s
+
+❯ 이번에는 간단한 FastAPI 스크립트 
+
+⏺ Write(fastapi_app.py)
+  ⎿  Wrote 11 lines to fastapi_app.py
+     from fastapi import FastAPI
+
+     app = FastAPI()
+
+     @app.get("/")
+     def read_root():
+         return {"message": "Hello, World!"}
+
+     @app.get("/items/{item_id}")
+     def read_item(item_id: int):
+     … +1 line (ctrl+o to expand)
+
+⏺ Ran 2 stop hooks (ctrl+o to expand)
+  ⎿  Stop hook prevented continuation
+
+✻ Worked for 1m 53s

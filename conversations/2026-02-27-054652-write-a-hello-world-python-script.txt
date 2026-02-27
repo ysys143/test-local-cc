@@ -1,0 +1,32 @@
+
+╭─── Claude Code v2.1.56 ──────────────────────────────────────────────────────╮
+│                                           │ Tips for getting started         │
+│              Welcome back js!             │ Run /init to create a CLAUDE.md… │
+│                                           │ ──────────────────────────────── │
+│                 ▗ ▗   ▖ ▖                 │ Recent activity                  │
+│                                           │ No recent activity               │
+│                   ▘▘ ▝▝                   │                                  │
+│                                           │                                  │
+│   qwen2.5-coder:32b · API Usage Billing   │                                  │
+│     ~/Documents/GitHub/test_local_cc      │                                  │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+  /model to try Opus 4.6
+
+❯ write a hello world python script 
+
+⏺ # Hello World Script
+  print("Hello, World!")
+
+⏺ Ran 2 stop hooks (ctrl+o to expand)
+  ⎿  Stop hook prevented continuation
+
+✻ Crunched for 39s
+
+❯ 파일을 쓰라고 
+
+⏺ # Hello World Python Script
+  print("Hello, World!")
+
+⏺ Ran 2 stop hooks (ctrl+o to expand)
+  ⎿  Stop hook prevented continuation
