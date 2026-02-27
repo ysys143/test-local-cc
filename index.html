@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Code API Dump Viewer</title>
+<title>Claude Code Local</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,9 +51,18 @@
 
   #sidebar-header h1 {
     font-size: 15px;
+    transition: color .15s;
     font-weight: 700;
     color: var(--text);
     letter-spacing: .3px;
+  }
+
+  #sidebar-header h1:hover { color: var(--purple); }
+
+  .lang-btn.active {
+    border-color: var(--purple);
+    color: var(--purple);
+    background: rgba(199,125,255,.1);
   }
 
   #sidebar-header .sub {
@@ -831,8 +840,11 @@
 <div id="sidebar">
   <div id="sidebar-header">
     <div style="display:flex;align-items:center;justify-content:space-between;">
-      <h1>API Dump Viewer</h1>
-      <button class="btn" id="btn-lang" style="font-size:10px;padding:3px 8px;min-width:0;" title="Toggle language">EN</button>
+      <h1 id="home-btn" style="cursor:pointer;" title="Home">Claude Code Local</h1>
+      <div style="display:flex;gap:2px;">
+        <button class="btn lang-btn" id="btn-lang-en" style="font-size:10px;padding:3px 7px;min-width:0;">EN</button>
+        <button class="btn lang-btn" id="btn-lang-ko" style="font-size:10px;padding:3px 7px;min-width:0;">KO</button>
+      </div>
     </div>
     <div class="sub" id="sidebar-count">Loading...</div>
   </div>
@@ -1665,14 +1677,31 @@ function applyI18n() {
     const key = el.getAttribute('data-i18n-html');
     if (t[key] != null) el.innerHTML = t[key];
   });
-  const btn = document.getElementById('btn-lang');
-  if (btn) btn.textContent = currentLang === 'ko' ? 'KO' : 'EN';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById('btn-lang-' + currentLang);
+  if (activeBtn) activeBtn.classList.add('active');
 }
 
-document.getElementById('btn-lang').addEventListener('click', () => {
-  currentLang = currentLang === 'en' ? 'ko' : 'en';
+document.getElementById('btn-lang-en').addEventListener('click', () => {
+  currentLang = 'en';
   try { localStorage.setItem('viewer_lang', currentLang); } catch(e) {}
   applyI18n();
+});
+document.getElementById('btn-lang-ko').addEventListener('click', () => {
+  currentLang = 'ko';
+  try { localStorage.setItem('viewer_lang', currentLang); } catch(e) {}
+  applyI18n();
+});
+
+// Home button — show landing page
+document.getElementById('home-btn').addEventListener('click', () => {
+  currentFile = null;
+  try { localStorage.removeItem('viewer_selected_file'); } catch(e) {}
+  document.querySelectorAll('.file-item').forEach(x => x.classList.remove('active'));
+  document.getElementById('dump-view').style.display = 'none';
+  document.getElementById('empty-state').style.display = '';
+  topbarFilename.textContent = '';
+  if (compareMode) toggleCompare();
 });
 
 applyI18n();
