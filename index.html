@@ -830,7 +830,10 @@
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="sidebar-header">
-    <h1>API Dump Viewer</h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <h1>API Dump Viewer</h1>
+      <button class="btn" id="btn-lang" style="font-size:10px;padding:3px 8px;min-width:0;" title="Toggle language">EN</button>
+    </div>
     <div class="sub" id="sidebar-count">Loading...</div>
   </div>
   <div id="sidebar-list"></div>
@@ -845,24 +848,17 @@
 
   <div id="content">
     <div id="empty-state">
-      <h2>Claude Code API Request Analysis</h2>
-      <p style="font-size:13px;color:var(--text-muted);margin:-16px 0 0 0;">
-        Analyzing how Claude Code communicates with inference servers via the Anthropic Messages API.
-      </p>
+      <h2 data-i18n="title"></h2>
+      <p style="font-size:13px;color:var(--text-muted);margin:-16px 0 0 0;" data-i18n="subtitle"></p>
 
       <div class="landing-section">
-        <h3>Experiment Overview</h3>
-        <p>
-          This dashboard visualizes raw API request bodies captured from <b>Claude Code</b> sessions
-          routed through a local <code>llama serve</code> proxy. The goal is to understand the structure,
-          size, and multi-turn patterns of Claude Code's API requests — comparing a fully configured
-          environment (plugins, global settings, MCP servers) against a vanilla installation.
-        </p>
+        <h3 data-i18n="overview_title"></h3>
+        <p data-i18n-html="overview_body"></p>
       </div>
 
       <div class="landing-grid">
         <div class="landing-section">
-          <h3>Hardware</h3>
+          <h3 data-i18n="hw_title"></h3>
           <ul>
             <li><b>Machine:</b> MacBook Pro, Apple M3 Max</li>
             <li><b>Memory:</b> 36 GB unified</li>
@@ -870,63 +866,40 @@
           </ul>
         </div>
         <div class="landing-section">
-          <h3>Software</h3>
+          <h3 data-i18n="sw_title"></h3>
           <ul>
             <li><b>Model:</b> Qwen 3.5 35B (Q4_K_M, 20.1 GB)</li>
             <li><b>Backend:</b> llama.cpp (llama-server)</li>
-            <li><b>Proxy:</b> llama serve (<code>--log-dir</code> for body dumps)</li>
-            <li><b>Client:</b> Claude Code (headless, <code>-p</code> mode)</li>
+            <li><b>Proxy:</b> llama serve (<code>--log-dir</code>)</li>
+            <li><b>Client:</b> Claude Code (headless, <code>-p</code>)</li>
           </ul>
         </div>
         <div class="landing-section">
-          <h3>Test Setup</h3>
-          <ul>
-            <li><b>NORMAL:</b> Full user config — global CLAUDE.md, plugins (oh-my-claudecode, etc.), MCP servers</li>
-            <li><b>CLEAN:</b> Vanilla Claude Code — <code>HOME=/tmp/claude-clean</code> override, no plugins or custom settings</li>
-            <li><b>Server restart</b> between each test for KV cache fairness</li>
-          </ul>
+          <h3 data-i18n="setup_title"></h3>
+          <ul data-i18n-html="setup_body"></ul>
         </div>
         <div class="landing-section">
-          <h3>Test Prompts</h3>
-          <ul>
-            <li><b>hello:</b> Write a python script that prints 'hello world', save as hello.py, then execute it</li>
-            <li><b>fibonacci:</b> Write a python script that prints fibonacci (1st-50th), save as fib.py, then execute it</li>
-            <li><b>fastapi:</b> Write a simple FastAPI app with GET / and GET /health endpoints, save as app.py</li>
-          </ul>
+          <h3 data-i18n="prompts_title"></h3>
+          <ul data-i18n-html="prompts_body"></ul>
         </div>
       </div>
 
       <div class="stat-row">
-        <div class="stat-card"><div class="val">38</div><div class="lbl">Total Requests</div></div>
-        <div class="stat-card"><div class="val">10</div><div class="lbl">Sessions</div></div>
-        <div class="stat-card"><div class="val">3.5 MB</div><div class="lbl">Total Data</div></div>
-        <div class="stat-card"><div class="val">7</div><div class="lbl">Internal (Haiku)</div></div>
+        <div class="stat-card"><div class="val">38</div><div class="lbl" data-i18n="stat_reqs"></div></div>
+        <div class="stat-card"><div class="val">10</div><div class="lbl" data-i18n="stat_sessions"></div></div>
+        <div class="stat-card"><div class="val">3.5 MB</div><div class="lbl" data-i18n="stat_data"></div></div>
+        <div class="stat-card"><div class="val">7</div><div class="lbl" data-i18n="stat_internal"></div></div>
       </div>
 
       <div class="landing-section">
-        <h3>Key Findings</h3>
-        <div class="finding">
-          <b>Request size:</b> Normal avg <b>138 KB</b> vs Clean avg <b>95 KB</b> per request.
-          Tools account for <b>62%</b> of total payload (85.9 KB in normal, 61.1 KB in clean).
-        </div>
-        <div class="finding">
-          <b>Latency:</b> Normal avg <b>123.3s</b> vs Clean avg <b>76.5s</b> (+46.7s, 38% slower).
-          The slowdown is disproportionate to the size increase — complex system instructions
-          appear to increase thinking/reasoning time.
-        </div>
-        <div class="finding">
-          <b>Multi-turn overhead:</b> Each agentic turn re-sends the full conversation history
-          (system + tools + all prior messages). A 6-turn session sends the 85 KB tools payload <b>6 times</b>.
-        </div>
-        <div class="finding">
-          <b>Internal calls:</b> Claude Code makes lightweight <code>claude-haiku</code> sub-calls
-          for tool result summarization and title generation. These are ~1.7 KB each with no tools attached.
-        </div>
+        <h3 data-i18n="findings_title"></h3>
+        <div class="finding" data-i18n-html="finding1"></div>
+        <div class="finding" data-i18n-html="finding2"></div>
+        <div class="finding" data-i18n-html="finding3"></div>
+        <div class="finding" data-i18n-html="finding4"></div>
       </div>
 
-      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;">
-        Select a session from the sidebar to inspect individual API requests.
-      </p>
+      <p style="font-size:11px;color:var(--text-muted);text-align:center;margin-top:8px;" data-i18n="cta"></p>
     </div>
     <div id="dump-view" style="display:none;"></div>
   </div>
@@ -1630,6 +1603,80 @@ function closeToolModal() {
   document.getElementById('tool-modal').classList.remove('active');
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeToolModal(); });
+
+// ── i18n ──
+const I18N = {
+  en: {
+    title: 'Claude Code API Request Analysis',
+    subtitle: 'Analyzing how Claude Code communicates with inference servers via the Anthropic Messages API.',
+    overview_title: 'Experiment Overview',
+    overview_body: 'This dashboard visualizes raw API request bodies captured from <b>Claude Code</b> sessions routed through a local <code>llama serve</code> proxy. The goal is to understand the structure, size, and multi-turn patterns of Claude Code\'s API requests — comparing a fully configured environment (plugins, global settings, MCP servers) against a vanilla installation.',
+    hw_title: 'Hardware',
+    sw_title: 'Software',
+    setup_title: 'Test Setup',
+    setup_body: '<li><b>NORMAL:</b> Full user config — global CLAUDE.md, plugins (oh-my-claudecode, etc.), MCP servers</li><li><b>CLEAN:</b> Vanilla Claude Code — <code>HOME=/tmp/claude-clean</code> override, no plugins or custom settings</li><li><b>Server restart</b> between each test for KV cache fairness</li>',
+    prompts_title: 'Test Prompts',
+    prompts_body: '<li><b>hello:</b> Write a python script that prints \'hello world\', save as hello.py, then execute it</li><li><b>fibonacci:</b> Write a python script that prints fibonacci (1st-50th), save as fib.py, then execute it</li><li><b>fastapi:</b> Write a simple FastAPI app with GET / and GET /health endpoints, save as app.py</li>',
+    stat_reqs: 'Total Requests',
+    stat_sessions: 'Sessions',
+    stat_data: 'Total Data',
+    stat_internal: 'Internal (Haiku)',
+    findings_title: 'Key Findings',
+    finding1: '<b>Request size:</b> Normal avg <b>138 KB</b> vs Clean avg <b>95 KB</b> per request. Tools account for <b>62%</b> of total payload (85.9 KB in normal, 61.1 KB in clean).',
+    finding2: '<b>Latency:</b> Normal avg <b>123.3s</b> vs Clean avg <b>76.5s</b> (+46.7s, 38% slower). The slowdown is disproportionate to the size increase — complex system instructions appear to increase thinking/reasoning time.',
+    finding3: '<b>Multi-turn overhead:</b> Each agentic turn re-sends the full conversation history (system + tools + all prior messages). A 6-turn session sends the 85 KB tools payload <b>6 times</b>.',
+    finding4: '<b>Internal calls:</b> Claude Code makes lightweight <code>claude-haiku</code> sub-calls for tool result summarization and title generation. These are ~1.7 KB each with no tools attached.',
+    cta: 'Select a session from the sidebar to inspect individual API requests.',
+  },
+  ko: {
+    title: 'Claude Code API 요청 분석',
+    subtitle: 'Claude Code가 Anthropic Messages API를 통해 추론 서버와 어떻게 통신하는지 분석합니다.',
+    overview_title: '실험 개요',
+    overview_body: '이 대시보드는 <b>Claude Code</b> 세션에서 로컬 <code>llama serve</code> 프록시를 통해 캡처한 API 요청 본문을 시각화합니다. 플러그인과 글로벌 설정이 적용된 환경(Normal)과 순정 상태(Clean)를 비교하여 요청의 구조, 크기, 멀티턴 패턴을 분석합니다.',
+    hw_title: '하드웨어',
+    sw_title: '소프트웨어',
+    setup_title: '테스트 환경',
+    setup_body: '<li><b>NORMAL:</b> 전체 사용자 설정 — CLAUDE.md, 플러그인(oh-my-claudecode 등), MCP 서버 포함</li><li><b>CLEAN:</b> 순정 Claude Code — <code>HOME=/tmp/claude-clean</code> 오버라이드, 플러그인/설정 없음</li><li>테스트 간 <b>서버 재시작</b>으로 KV 캐시 공정성 확보</li>',
+    prompts_title: '테스트 프롬프트',
+    prompts_body: '<li><b>hello:</b> \'hello world\' 출력하는 Python 스크립트 작성 후 실행</li><li><b>fibonacci:</b> 피보나치 수열(1~50번째) 출력 스크립트 작성 후 실행</li><li><b>fastapi:</b> GET / 과 GET /health 엔드포인트가 있는 FastAPI 앱 작성</li>',
+    stat_reqs: '총 요청 수',
+    stat_sessions: '세션',
+    stat_data: '총 데이터',
+    stat_internal: '내부 호출 (Haiku)',
+    findings_title: '주요 발견',
+    finding1: '<b>요청 크기:</b> Normal 평균 <b>138 KB</b> vs Clean 평균 <b>95 KB</b>. 도구(Tools)가 전체 페이로드의 <b>62%</b> 차지 (Normal 85.9 KB, Clean 61.1 KB).',
+    finding2: '<b>응답 지연:</b> Normal 평균 <b>123.3초</b> vs Clean 평균 <b>76.5초</b> (+46.7초, 38% 느림). 크기 증가 대비 지연이 불균형적 — 복잡한 시스템 지시가 사고/추론 시간을 증가시키는 것으로 추정.',
+    finding3: '<b>멀티턴 오버헤드:</b> 매 에이전트 턴마다 전체 대화 히스토리(시스템 + 도구 + 이전 메시지)를 재전송. 6턴 세션은 85 KB 도구 페이로드를 <b>6번</b> 반복 전송.',
+    finding4: '<b>내부 호출:</b> Claude Code는 도구 실행 결과 요약, 제목 생성 등을 위해 경량 <code>claude-haiku</code> 서브콜을 보냄. 각 ~1.7 KB, 도구 미포함.',
+    cta: '사이드바에서 세션을 선택하여 개별 API 요청을 확인하세요.',
+  }
+};
+
+let currentLang = (navigator.language || 'en').startsWith('ko') ? 'ko' : 'en';
+try { const saved = localStorage.getItem('viewer_lang'); if (saved) currentLang = saved; } catch(e) {}
+
+function applyI18n() {
+  const t = I18N[currentLang] || I18N.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] != null) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    if (t[key] != null) el.innerHTML = t[key];
+  });
+  const btn = document.getElementById('btn-lang');
+  if (btn) btn.textContent = currentLang === 'ko' ? 'KO' : 'EN';
+}
+
+document.getElementById('btn-lang').addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'ko' : 'en';
+  try { localStorage.setItem('viewer_lang', currentLang); } catch(e) {}
+  applyI18n();
+});
+
+applyI18n();
+
 </script>
 
 <div class="modal-overlay" id="tool-modal" onclick="if(event.target===this)closeToolModal()">
